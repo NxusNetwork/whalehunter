@@ -152,5 +152,15 @@
         fetchTransactions();
         setInterval(fetchTransactions, 5000);
     </script>
+     <script>
+    // Suppose your backend is at: https://your-heroku-app.herokuapp.com
+    fetch('https://your-heroku-app.herokuapp.com/transactions')
+      .then((res) => res.json())
+      .then((data) => {
+        console.log('Big transactions:', data);
+        // TODO: Update your UI to display these transactions
+      })
+      .catch((err) => console.error(err));
+  </script>
 </body>
 </html>
