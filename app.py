@@ -171,7 +171,8 @@ def get_transactions():
             max_supported_transaction_version=0,
             encoding="jsonParsed"
         )
-        block_data = block_resp.value
+        ui_block = block_resp.value
+block_data = ui_block.to_dict()
         if not block_data or "transactions" not in block_data:
             continue
 
