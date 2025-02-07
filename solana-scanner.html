@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Pulse - Solana Scanner</title>
+    <style>
+        /* Cyberpunk Neon Theme */
+        :root {
+            --neon-blue: #00f3ff;
+            --neon-pink: #ff00ff;
+            --dark-bg: #0a0a1a;
+        }
+
+        body {
+            margin: 0;
+            background: var(--dark-bg);
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
+        }
+
+        .cyber-container {
+            position: relative;
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 3px solid var(--neon-blue);
+            box-shadow: 0 0 20px var(--neon-blue);
+            background: rgba(10, 10, 26, 0.9);
+        }
+
+        .cyber-header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .cyber-title {
+            color: var(--neon-blue);
+            font-size: 2.5em;
+            text-shadow: 0 0 10px var(--neon-blue);
+            letter-spacing: 2px;
+            margin: 0;
+            animation: neonPulse 1.5s infinite alternate;
+        }
+
+        .data-stream {
+            position: relative;
+            min-height: 400px;
+            overflow-y: auto;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--neon-pink);
+        }
+
+        .transaction-card {
+            background: linear-gradient(45deg, rgba(0, 243, 255, 0.1), rgba(255, 0, 255, 0.1));
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid var(--neon-blue);
+            color: white;
+            animation: slideIn 0.5s ease-out;
+            transition: all 0.3s;
+        }
+
+        .transaction-card:hover {
+            transform: translateX(10px);
+            box-shadow: 0 0 15px var(--neon-pink);
+        }
+
+        .token-amount {
+            color: var(--neon-pink);
+            font-size: 1.2em;
+        }
+
+        .wallet-id {
+            color: var(--neon-blue);
+            font-family: monospace;
+        }
+
+        .scan-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon-blue), transparent);
+            animation: scan 3s linear infinite;
+        }
+
+        @keyframes neonPulse {
+            from { text-shadow: 0 0 10px var(--neon-blue); }
+            to { text-shadow: 0 0 20px var(--neon-blue), 0 0 30px var(--neon-blue); }
+        }
+
+        @keyframes scan {
+            0% { top: 0; opacity: 0; }
+            50% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="cyber-container">
+        <div class="cyber-header">
+            <h1 class="cyber-title">⨠ NEON PULSE ⨠</h1>
+            <p style="color: var(--neon-pink)">LIVE SOLANA TRANSACTION FEED</p>
+            <div class="scan-line"></div>
+        </div>
+        
+        <div class="data-stream" id="transaction-feed">
+            <!-- Transactions will appear here -->
+        </div>
+    </div>
+
+    <script>
+        // Backend API URL (Replace with your endpoint)
+        const API_URL = 'https://your-backend-api.com/transactions';
+
+        // Fetch data every 5 seconds
+        async function fetchTransactions() {
+            try {
+                const response = await fetch(API_URL);
+                const transactions = await response.json();
+                updateFeed(transactions);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        // Create transaction cards
+        function updateFeed(transactions) {
+            const feed = document.getElementById('transaction-feed');
+            
+            transactions.slice(0, 15).forEach(tx => {
+                const card = document.createElement('div');
+                card.className = 'transaction-card';
+                card.innerHTML = `
+                    <div class="wallet-id">⨠ ${shortenAddress(tx.wallet)}</div>
+                    <div class="token-amount">⨠ $${tx.amount.toLocaleString()} ⨠ ${tx.token}</div>
+                    <div style="color: #fff; margin-top: 8px;">${new Date().toLocaleTimeString()}</div>
+                `;
+                
+                // Add to top of feed
+                feed.insertBefore(card, feed.firstChild);
+                
+                // Limit to 15 entries
+                if(feed.children.length > 15) feed.lastChild.remove();
+            });
+        }
+
+        // Shorten wallet address
+        function shortenAddress(address) {
+            return `${address.slice(0, 6)}...${address.slice(-4)}`;
+        }
+
+        // Initial load and refresh every 5 seconds
+        fetchTransactions();
+        setInterval(fetchTransactions, 5000);
+    </script>
+</body>
+</html>
