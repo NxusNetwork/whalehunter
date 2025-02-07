@@ -1,5 +1,5 @@
 flask
 flask-cors
-solana
+solana==0.28.1
 requests
 gunicorn
