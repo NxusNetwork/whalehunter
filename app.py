@@ -18,7 +18,7 @@ def get_transactions():
                 results.append({
                     'wallet': details['result']['transaction']['message']['accountKeys'][0],
                     'amount': amount,
-                    'token': "SOL"  # Simplified for kids
+                    'token': "SOL"  # Simplified for now
                 })
         except:
             continue
