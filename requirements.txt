@@ -1,4 +1,5 @@
 flask
-solana
-gunicorn
 flask-cors
+solana
+requests
+gunicorn
