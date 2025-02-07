@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Neon Pulse - Solana Scanner</title>
     <style>
-        /* Cyberpunk Neon Theme */
         :root {
             --neon-blue: #00f3ff;
             --neon-pink: #ff00ff;
@@ -106,8 +105,8 @@
 <body>
     <div class="cyber-container">
         <div class="cyber-header">
-            <h1 class="cyber-title">⨠ NEON PULSE ⨠</h1>
-            <p style="color: var(--neon-pink)">LIVE SOLANA TRANSACTION FEED</p>
+            <h1 class="cyber-title">⨠ Whale Hunter ⨠</h1>
+            <p style="color: var(--neon-pink)">LIVE SOLANA WHALE FEED</p>
             <div class="scan-line"></div>
         </div>
         
@@ -117,10 +116,8 @@
     </div>
 
     <script>
-        // Backend API URL (Replace with your endpoint)
-        const API_URL = 'https://your-backend-api.com/transactions';
+        const API_URL = 'https://whalehunter-857a4cb0844c.herokuapp.com/';  // Replace with your Heroku URL
 
-        // Fetch data every 5 seconds
         async function fetchTransactions() {
             try {
                 const response = await fetch(API_URL);
@@ -131,7 +128,6 @@
             }
         }
 
-        // Create transaction cards
         function updateFeed(transactions) {
             const feed = document.getElementById('transaction-feed');
             
@@ -144,20 +140,15 @@
                     <div style="color: #fff; margin-top: 8px;">${new Date().toLocaleTimeString()}</div>
                 `;
                 
-                // Add to top of feed
                 feed.insertBefore(card, feed.firstChild);
-                
-                // Limit to 15 entries
                 if(feed.children.length > 15) feed.lastChild.remove();
             });
         }
 
-        // Shorten wallet address
         function shortenAddress(address) {
             return `${address.slice(0, 6)}...${address.slice(-4)}`;
         }
 
-        // Initial load and refresh every 5 seconds
         fetchTransactions();
         setInterval(fetchTransactions, 5000);
     </script>
