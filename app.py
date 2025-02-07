@@ -16,7 +16,7 @@ TOKEN_LIST_URL = (
     "https://raw.githubusercontent.com/solana-labs/token-list/main/src/tokens/solana.tokenlist.json"
 )
 
-@app.before_first_request
+
 def load_token_list():
     """
     Pulls down the official Solana token list JSON and builds:
