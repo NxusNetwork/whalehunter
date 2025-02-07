@@ -1,2 +1,4 @@
-Flask==2.0.3
-solana==0.25.0
+flask
+solana
+gunicorn
+flask-cors
