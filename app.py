@@ -6,23 +6,62 @@ app = Flask(__name__)
 CORS(app)
 client = Client("https://api.mainnet-beta.solana.com")
 
+# Fake "big transaction" threshold in lamports:
+# 1 SOL = 1,000,000,000 lamports.
+# If you really want $10k, you need to find current SOL price and do a conversion.
+BIG_TX_LAMPORTS = 10000000000  # = 10 SOL, for example
+
 @app.route('/transactions')
 def get_transactions():
-    transactions = client.get_recent_transactions()
-    results = []
-    for tx in transactions[:10]:  # Check first 10 transactions
-        try:
-            details = client.get_transaction(tx['signature'])
-            amount = details['result']['meta']['postBalances'][0] - details['result']['meta']['preBalances'][0]
-            if amount > 10000:
-                results.append({
-                    'wallet': details['result']['transaction']['message']['accountKeys'][0],
-                    'amount': amount,
-                    'token': "SOL"  # Simplified for now
-                })
-        except:
+    # How many blocks back to scan:
+    blocks_to_check = 5
+
+    # Get the current slot (like latest block number)
+    latest_slot_resp = client.get_slot()
+    if not latest_slot_resp["result"]:
+        return jsonify([])
+
+    latest_slot = latest_slot_resp["result"]
+    big_transactions = []
+
+    # Go backwards through the last few blocks
+    for slot in range(latest_slot, latest_slot - blocks_to_check, -1):
+        block_resp = client.get_block(slot)
+        block_data = block_resp.get("result")
+        if not block_data or "transactions" not in block_data:
             continue
-    return jsonify(results)
+
+        # Each "transaction" here includes meta, signatures, etc.
+        for tx in block_data["transactions"]:
+            meta = tx.get("meta")
+            transaction = tx.get("transaction")
+
+            if not meta or not transaction:
+                continue
+
+            pre_balances = meta.get("preBalances", [])
+            post_balances = meta.get("postBalances", [])
+            if not pre_balances or not post_balances:
+                continue
+
+            # For simplicity, just compare the 0th account’s balance change
+            diff = post_balances[0] - pre_balances[0]
+
+            # If diff is larger than "threshold"
+            if diff >= BIG_TX_LAMPORTS:
+                # The 0th key is often the fee-payer or main signer
+                account_keys = transaction["message"].get("accountKeys", [])
+                wallet = account_keys[0] if account_keys else "unknown"
+
+                # Make up a "token" name for now; real parsing is more involved
+                big_transactions.append({
+                    "wallet": wallet,
+                    "amount": diff,  # in lamports
+                    "token": "SOL (?)",  # or some default
+                    "slot": slot
+                })
+
+    return jsonify(big_transactions)
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
