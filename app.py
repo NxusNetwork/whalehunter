@@ -152,7 +152,7 @@ def get_transactions():
     all_transfers = []
 
     for slot in range(latest_slot, latest_slot - blocks_to_check, -1):
-        block_resp = client.get_block(slot)
+        block_resp = client.get_block(slot, max_supported_transaction_version=0)
         block_data = block_resp.value
         if not block_data or not block_data.transactions:
             continue
