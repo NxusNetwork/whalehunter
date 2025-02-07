@@ -172,7 +172,7 @@ def get_transactions():
             encoding="jsonParsed"
         )
         ui_block = block_resp.value
-block_data = ui_block.to_dict()
+        block_data = ui_block.to_dict()
         if not block_data or "transactions" not in block_data:
             continue
 
